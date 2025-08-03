@@ -1,13 +1,45 @@
-import { Toaster } from 'react-hot-toast'
+'use client'
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { supabase } from '../utils/supabaseClient'
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+  const [sessionChecked, setSessionChecked] = useState(false)
+  const router = useRouter()
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) router.push('/auth')
+      else setSessionChecked(true)
+    }
+    checkSession()
+  }, [router])
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    router.push('/auth')
+  }
+
+  if (!sessionChecked) return null
+
   return (
-    <html lang="en">
-      <body>
-        <Toaster position="top-right" />
-        {children}
-      </body>
-    </html>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="flex justify-between items-center px-6 py-4 bg-white border-b shadow-sm">
+        <h1 className="text-lg font-semibold">RoyaltIQ</h1>
+        <button
+          onClick={handleSignOut}
+          className="text-sm px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+        >
+          Sign Out
+        </button>
+      </header>
+
+      {/* Main content */}
+      <main className="max-w-5xl mx-auto px-4 py-6">{children}</main>
+    </div>
   )
 }
 
