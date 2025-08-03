@@ -86,12 +86,6 @@ export default function CatalogsPage() {
               <h3 className="text-lg font-semibold">{catalog.title}</h3>
               <p className="text-sm text-gray-500 mb-2">by {catalog.artist}</p>
 
-              {catalog.earnings_last_12mo !== undefined && (
-                <p className="text-sm font-medium mb-1">
-                  12-Month Earnings: ${catalog.earnings_last_12mo.toLocaleString()}
-                </p>
-              )}
-
               {catalog.estimated_earnings !== undefined && (
                 <p className="text-sm text-gray-600 mb-1">
                   Estimated Earnings (based on popularity):
