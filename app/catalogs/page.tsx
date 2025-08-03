@@ -1,14 +1,24 @@
 'use client'
+
 import { useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabase'
 
 export default function CatalogsPage() {
   const [catalogs, setCatalogs] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/mockCatalogs')  // Replace with Supabase or real API
-      .then((res) => res.json())
-      .then(setCatalogs)
+    const fetchCatalogs = async () => {
+      const { data, error } = await supabase.from('catalogs').select('*')
+      if (error) console.error('Error fetching catalogs:', error)
+      else setCatalogs(data || [])
+      setLoading(false)
+    }
+
+    fetchCatalogs()
   }, [])
+
+  if (loading) return <p>Loading...</p>
 
   return (
     <div>
@@ -22,13 +32,10 @@ export default function CatalogsPage() {
             <p>YouTube Views: {catalog.youtube_views}</p>
             <p>Est. Earnings: ${catalog.estimated_earnings}</p>
             <p>Valuation Score: {catalog.valuation_score}</p>
-            <div className="flex gap-2 mt-2">
-              <button className="border px-2 py-1 rounded bg-blue-100">Generate Summary</button>
-              <button className="border px-2 py-1 rounded bg-green-100">Generate Explanation</button>
-            </div>
           </div>
         ))}
       </div>
     </div>
   )
 }
+
