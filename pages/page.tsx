@@ -2,13 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/utils/supabase/client'
+import { supabase } from '../utils/supabaseClient'
 
 export default function Home() {
   const [loading, setLoading] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const router = useRouter()
-  const supabase = createClient()
 
   useEffect(() => {
     const checkSession = async () => {
@@ -50,3 +49,4 @@ export default function Home() {
     </main>
   )
 }
+
