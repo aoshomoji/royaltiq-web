@@ -38,7 +38,7 @@ export default function AuthPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: 'http://localhost:3000/catalogs', // explicitly set
+        redirectTo: 'https://royaltiq-web.vercel.app/catalogs', // explicitly set
       },
     });
   
