@@ -6,14 +6,20 @@ import { supabase } from '../utils/supabaseClient'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [sessionChecked, setSessionChecked] = useState(false)
+  const [userEmail, setUserEmail] = useState<string | null>(null)
   const router = useRouter()
 
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
-      if (!session) router.push('/auth')
-      else setSessionChecked(true)
+      if (!session) {
+        router.push('/auth')
+      } else {
+        setUserEmail(session.user.email)
+        setSessionChecked(true)
+      }
     }
+
     checkSession()
   }, [router])
 
@@ -29,12 +35,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       {/* Header */}
       <header className="flex justify-between items-center px-6 py-4 bg-white border-b shadow-sm">
         <h1 className="text-lg font-semibold">RoyaltIQ</h1>
-        <button
-          onClick={handleSignOut}
-          className="text-sm px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-        >
-          Sign Out
-        </button>
+        <div className="flex items-center gap-4">
+          {userEmail && <span className="text-sm text-gray-700">{userEmail}</span>}
+          <button
+            onClick={handleSignOut}
+            className="text-sm px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+          >
+            Sign Out
+          </button>
+        </div>
       </header>
 
       {/* Main content */}
