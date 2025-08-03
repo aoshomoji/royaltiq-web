@@ -71,7 +71,7 @@ export default function CatalogsPage() {
   const generateSummary = async (catalog: Catalog) => {
     setLoadingId(catalog.id);
     try {
-      const res = await fetch('http://localhost:8000/summarize', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/summarize`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(catalog),
@@ -91,7 +91,7 @@ export default function CatalogsPage() {
   const generateExplanation = async (catalog: Catalog) => {
     setLoadingExplainId(catalog.id);
     try {
-      const res = await fetch('http://localhost:8000/explain', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/explain`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(catalog),
