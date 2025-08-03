@@ -72,7 +72,11 @@ export default function ImportPage() {
             <div key={track.id} className="p-4 border rounded-lg bg-white">
               <div className="font-semibold">{track.name}</div>
               <div className="text-sm text-gray-500">{track.artists.map((a: any) => a.name).join(', ')}</div>
-              <div className="text-xs text-gray-400 mb-2">Popularity: {track.popularity}</div>
+              <div className="text-xs text-gray-400">Popularity: {track.popularity}</div>
+              <div className="text-xs text-gray-500 mb-2">
+                Estimated Earnings (based on popularity): ${Math.round(track.popularity * 5000).toLocaleString()}
+                <span title="This is a placeholder estimate using Spotify's popularity score, not actual royalty data." className="ml-1 cursor-help text-gray-400">ⓘ</span>
+              </div>
               <button
                 onClick={() => handleImport(track)}
                 disabled={importingId === track.id}
@@ -87,4 +91,3 @@ export default function ImportPage() {
     </main>
   )
 }
-
