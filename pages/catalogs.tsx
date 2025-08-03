@@ -105,6 +105,11 @@ export default function CatalogsPage() {
                 </p>
               )}
 
+              {catalog.valuation_score !== undefined && (
+                <p className="text-sm text-gray-700">
+                  Valuation Score: <span className="font-medium">{catalog.valuation_score}</span>
+                </p>
+              )}
               {catalog.popularity !== undefined && (
                 <p className="text-sm text-gray-700">
                   Spotify Popularity: <span className="font-medium">{catalog.popularity}</span>
