@@ -4,90 +4,81 @@ import { useState } from 'react'
 import { supabase } from '../../utils/supabaseClient'
 
 export default function ImportPage() {
-  const [query, setQuery] = useState('')
-  const [results, setResults] = useState<any[]>([])
+  const [artistId, setArtistId] = useState('')
   const [loading, setLoading] = useState(false)
-  const [importingId, setImportingId] = useState<string | null>(null)
+  const [message, setMessage] = useState('')
 
-  const searchSpotify = async () => {
+  const handleImport = async () => {
+    if (!artistId) return
+
     setLoading(true)
-    try {
-      const res = await fetch(`/api/spotify-search?q=${encodeURIComponent(query)}`)
-      const data = await res.json()
-      setResults(data.tracks || [])
-    } catch (err) {
-      console.error('Search error:', err)
-      setResults([])
-    } finally {
-      setLoading(false)
-    }
-  }
+    setMessage('')
 
-  const handleImport = async (track: any) => {
-    setImportingId(track.id)
-    try {
-      const estimatedEarnings = Math.round(track.popularity * 5000) // Placeholder earnings logic
+    const res = await fetch(`https://api.spotify.com/v1/artists/${artistId}/top-tracks?market=GB`, {
+      headers: {
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_SPOTIFY_ACCESS_TOKEN}`,
+      },
+    })
+
+    const json = await res.json()
+    const tracks = json.tracks || []
+
+    for (const track of tracks) {
+      const popularity = track.popularity || 0
+      const spotifyStreams = Math.round(popularity * 50000)
+      const youtubeViews = Math.round(popularity * 100000)
+      const estimatedEarnings = Math.round(popularity * 5000)
+      const valuationScore = Math.min(100, Math.round((popularity / 100) * 80 + Math.random() * 20))
+
       const { error } = await supabase.from('catalogs').insert([
         {
           id: track.id,
           title: track.name,
           artist: track.artists.map((a: any) => a.name).join(', '),
+          popularity,
+          spotify_streams: spotifyStreams,
+          youtube_views: youtubeViews,
+          estimated_earnings: estimatedEarnings,
+          valuation_score: valuationScore,
           summary: null,
           explanation: null,
-          earnings: estimatedEarnings,
         },
       ])
-      if (error) throw error
-      alert('Imported successfully')
-    } catch (err) {
-      console.error('Import error:', err)
-      alert('Failed to import track')
-    } finally {
-      setImportingId(null)
+
+      if (error) {
+        console.error('Insert error:', error)
+        setMessage('Import failed.')
+        setLoading(false)
+        return
+      }
     }
+
+    setMessage(`Successfully imported ${tracks.length} tracks.`)
+    setLoading(false)
   }
 
   return (
-    <main className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Import from Spotify</h1>
-      <div className="flex gap-3 mb-6">
-        <input
-          type="text"
-          placeholder="Search by artist or track title"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="border px-4 py-2 rounded-lg flex-grow"
-        />
-        <button
-          onClick={searchSpotify}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg"
-          disabled={loading}
-        >
-          {loading ? 'Searching...' : 'Search'}
-        </button>
-      </div>
-      {results.length > 0 && (
-        <div className="space-y-4">
-          {results.map((track) => (
-            <div key={track.id} className="p-4 border rounded-lg bg-white">
-              <div className="font-semibold">{track.name}</div>
-              <div className="text-sm text-gray-500">{track.artists.map((a: any) => a.name).join(', ')}</div>
-              <div className="text-xs text-gray-400">Popularity: {track.popularity}</div>
-              <div className="text-xs text-gray-500 mb-2">
-                Estimated Earnings (based on popularity): ${Math.round(track.popularity * 5000).toLocaleString()}
-                <span title="This is a placeholder estimate using Spotify's popularity score, not actual royalty data." className="ml-1 cursor-help text-gray-400">ⓘ</span>
-              </div>
-              <button
-                onClick={() => handleImport(track)}
-                disabled={importingId === track.id}
-                className="text-sm px-3 py-1 bg-green-600 text-white rounded-lg"
-              >
-                {importingId === track.id ? 'Importing...' : 'Import to Supabase'}
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+    <main className="p-6 max-w-xl mx-auto">
+      <h1 className="text-xl font-bold mb-4">Admin: Import from Spotify</h1>
+
+      <input
+        type="text"
+        placeholder="Enter Spotify Artist ID"
+        value={artistId}
+        onChange={(e) => setArtistId(e.target.value)}
+        className="w-full px-3 py-2 border rounded mb-4"
+      />
+
+      <button
+        onClick={handleImport}
+        disabled={loading || !artistId}
+        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+      >
+        {loading ? 'Importing...' : 'Import Top Tracks'}
+      </button>
+
+      {message && <p className="mt-4 text-sm text-gray-700">{message}</p>}
     </main>
   )
 }
+
