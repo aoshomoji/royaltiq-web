@@ -11,6 +11,7 @@ interface Catalog {
   artist: string
   summary: string | null
   explanation: string | null
+  estimated_earnings?: number
 }
 
 export default function Catalogs() {
@@ -102,7 +103,21 @@ export default function Catalogs() {
             className="bg-white p-6 rounded-xl shadow-sm border"
           >
             <h2 className="text-lg font-semibold">{catalog.title}</h2>
-            <p className="text-sm text-gray-500 mb-3">by {catalog.artist}</p>
+            <p className="text-sm text-gray-500 mb-1">by {catalog.artist}</p>
+
+            {catalog.estimated_earnings && (
+              <p className="text-sm text-gray-600 mb-3">
+                <strong>Estimated Earnings (based on popularity):</strong>{' '}
+                ${catalog.estimated_earnings.toLocaleString()}
+                <span
+                  title="This is a placeholder estimate using Spotify's popularity score, not actual royalty data."
+                  className="ml-1 cursor-help text-gray-400"
+                >
+                  ⓘ
+                </span>
+              </p>
+            )}
+
             <div className="flex gap-3 mb-4">
               <button
                 onClick={() => handleSummarize(catalog.id)}
@@ -127,6 +142,7 @@ export default function Catalogs() {
                 {loadingId === catalog.id ? 'Loading...' : 'Explain'}
               </button>
             </div>
+
             {catalog.summary ? (
               <div className="bg-gray-100 p-4 rounded-xl text-sm text-gray-700 whitespace-pre-wrap">
                 <strong>Summary:</strong>
@@ -136,6 +152,7 @@ export default function Catalogs() {
             ) : (
               <p className="text-sm italic text-gray-400">No summary yet.</p>
             )}
+
             {catalog.explanation ? (
               <div className="bg-gray-100 mt-3 p-4 rounded-xl text-sm text-gray-700 whitespace-pre-wrap">
                 <strong>Explanation:</strong>
@@ -151,3 +168,4 @@ export default function Catalogs() {
     </main>
   )
 }
+
