@@ -1,154 +1,159 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { supabase } from '../utils/supabaseClient'
-import toast, { Toaster } from 'react-hot-toast'
-import Layout from './layout'
+import { useRouter } from 'next/router'
 
 export default function CatalogsPage() {
   const [catalogs, setCatalogs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [loadingId, setLoadingId] = useState<string | null>(null)
-  const router = useRouter()
+  const [user, setUser] = useState<any>(null)
+  const [showSummary, setShowSummary] = useState<{ [key: string]: boolean }>({})
+  const [showExplanation, setShowExplanation] = useState<{ [key: string]: boolean }>({})
 
   useEffect(() => {
     const fetchCatalogs = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        router.push('/auth')
-        return
-      }
-
       const { data, error } = await supabase.from('catalogs').select('*')
       if (error) console.error('Error fetching catalogs:', error)
       else setCatalogs(data || [])
       setLoading(false)
     }
 
+    const getUser = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      setUser(session?.user || null)
+    }
+
     fetchCatalogs()
-  }, [router])
+    getUser()
+  }, [])
 
-  const refreshCatalogs = async () => {
-    const { data, error } = await supabase.from('catalogs').select('*')
-    if (!error && data) setCatalogs(data)
-  }
-
-  const handleAction = async (catalogId: string, type: 'summarize' | 'explain') => {
-    setLoadingId(catalogId)
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${type}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ catalog_id: catalogId }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || `Failed to ${type}`)
-      toast.success(`${type === 'summarize' ? 'Summary' : 'Explanation'} generated!`)
-      await refreshCatalogs()
-    } catch (err) {
-      console.error(err)
-      toast.error(`Error generating ${type}`)
-    } finally {
-      setLoadingId(null)
+  const generateSummary = async (id: number) => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/summarize`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ catalog_id: id }),
+    })
+    if (res.ok) {
+      setShowSummary((prev) => ({ ...prev, [id]: true }))
     }
   }
 
+  const generateExplanation = async (id: number) => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/explain`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ catalog_id: id }),
+    })
+    if (res.ok) {
+      setShowExplanation((prev) => ({ ...prev, [id]: true }))
+    }
+  }
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    window.location.href = '/auth'
+  }
+
   return (
-    <Layout>
-      <main className="p-6 bg-gray-50 min-h-screen">
-        <Toaster position="top-right" />
-        <h1 className="text-2xl font-bold mb-6">Your Catalogs</h1>
-
-        {loading ? (
-          <p>Loading catalogs...</p>
-        ) : catalogs.length === 0 ? (
-          <p>No catalogs found.</p>
-        ) : (
-          <div className="space-y-6">
-            {catalogs.map((catalog) => (
-              <div key={catalog.id} className="bg-white p-6 rounded-xl shadow-sm border">
-                <h2 className="text-xl font-semibold">{catalog.title}</h2>
-                <p className="text-sm text-gray-500 mb-1">by {catalog.artist}</p>
-
-                {catalog.estimated_earnings && (
-                  <p className="text-sm text-gray-600 mb-2">
-                    <strong>Estimated Earnings (based on popularity):</strong>{' '}
-                    ${catalog.estimated_earnings.toLocaleString()}
-                    <span
-                      title="This is a placeholder estimate using Spotify's popularity score, not actual royalty data."
-                      className="ml-1 cursor-help text-gray-400"
-                    >
-                      ⓘ
-                    </span>
-                  </p>
-                )}
-
-                {catalog.earnings_last_12mo && (
-                  <p className="text-sm text-gray-600 mb-1">
-                    <strong>12-Month Earnings:</strong> ${catalog.earnings_last_12mo.toLocaleString()}
-                  </p>
-                )}
-
-                {catalog.streams && (
-                  <p className="text-sm text-gray-600 mb-1">
-                    <strong>Spotify Streams:</strong> {catalog.streams.toLocaleString()}
-                  </p>
-                )}
-
-                {catalog.views && (
-                  <p className="text-sm text-gray-600 mb-3">
-                    <strong>YouTube Views:</strong> {catalog.views.toLocaleString()}
-                  </p>
-                )}
-
-                <div className="flex gap-3 mb-4">
-                  <button
-                    onClick={() => handleAction(catalog.id, 'summarize')}
-                    disabled={loadingId === catalog.id}
-                    className={`px-3 py-2 rounded-lg font-medium text-white transition ${
-                      loadingId === catalog.id
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-blue-600 hover:bg-blue-700'
-                    }`}
-                  >
-                    {loadingId === catalog.id ? 'Loading...' : 'Generate Summary'}
-                  </button>
-
-                  <button
-                    onClick={() => handleAction(catalog.id, 'explain')}
-                    disabled={loadingId === catalog.id}
-                    className={`px-3 py-2 rounded-lg font-medium text-white transition ${
-                      loadingId === catalog.id
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-green-600 hover:bg-green-700'
-                    }`}
-                  >
-                    {loadingId === catalog.id ? 'Loading...' : 'Explain'}
-                  </button>
-                </div>
-
-                {catalog.summary && (
-                  <div className="bg-gray-100 p-4 rounded-xl text-sm text-gray-700 whitespace-pre-wrap">
-                    <strong>Summary:</strong>
-                    <br />
-                    {catalog.summary}
-                  </div>
-                )}
-
-                {catalog.explanation && (
-                  <div className="bg-gray-100 mt-3 p-4 rounded-xl text-sm text-gray-700 whitespace-pre-wrap">
-                    <strong>Explanation:</strong>
-                    <br />
-                    {catalog.explanation}
-                  </div>
-                )}
-              </div>
-            ))}
+    <main className="p-6 max-w-4xl mx-auto">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">RoyaltiQ</h1>
+        {user && (
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-700">{user.email}</span>
+            <button
+              onClick={handleSignOut}
+              className="text-sm px-3 py-1 bg-gray-100 border rounded hover:bg-gray-200"
+            >
+              Sign Out
+            </button>
           </div>
         )}
-      </main>
-    </Layout>
+      </div>
+
+      <h2 className="text-xl font-bold mb-4">Your Catalogs</h2>
+      {loading ? (
+        <p>Loading...</p>
+      ) : catalogs.length === 0 ? (
+        <p>No catalogs found.</p>
+      ) : (
+        <div className="space-y-6">
+          {catalogs.map((catalog) => (
+            <div key={catalog.id} className="p-4 border rounded-lg bg-white shadow-sm">
+              <h3 className="text-lg font-semibold">{catalog.title}</h3>
+              <p className="text-sm text-gray-500 mb-2">by {catalog.artist}</p>
+
+              {catalog.earnings_last_12mo !== undefined && (
+                <p className="text-sm font-medium mb-1">
+                  12-Month Earnings: ${catalog.earnings_last_12mo.toLocaleString()}
+                </p>
+              )}
+
+              {catalog.estimated_earnings !== undefined && (
+                <p className="text-sm text-gray-600 mb-1">
+                  Estimated Earnings (based on popularity):
+                  <span className="font-medium"> ${catalog.estimated_earnings.toLocaleString()}</span>
+                  <span
+                    title="This is a placeholder estimate using Spotify's popularity score, not actual royalty data."
+                    className="ml-1 cursor-help text-gray-400"
+                  >
+                    ⓘ
+                  </span>
+                </p>
+              )}
+
+              {catalog.popularity !== undefined && (
+                <p className="text-sm text-gray-700">
+                  Spotify Popularity: <span className="font-medium">{catalog.popularity}</span>
+                </p>
+              )}
+              {catalog.spotify_streams !== undefined && (
+                <p className="text-sm text-gray-700">
+                  Spotify Streams: <span className="font-medium">{catalog.spotify_streams.toLocaleString()}</span>
+                </p>
+              )}
+              {catalog.youtube_views !== undefined && (
+                <p className="text-sm text-gray-700">
+                  YouTube Views: <span className="font-medium">{catalog.youtube_views.toLocaleString()}</span>
+                </p>
+              )}
+
+              <div className="mt-3 space-x-2">
+                <button
+                  onClick={() => generateSummary(catalog.id)}
+                  className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  Generate Summary
+                </button>
+                <button
+                  onClick={() => generateExplanation(catalog.id)}
+                  className="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
+                >
+                  Explain
+                </button>
+              </div>
+
+              {showSummary[catalog.id] && catalog.summary && (
+                <div className="mt-3">
+                  <p className="text-sm font-medium text-gray-800 mb-1">Summary:</p>
+                  <p className="text-sm text-gray-700 whitespace-pre-line">{catalog.summary}</p>
+                </div>
+              )}
+
+              {showExplanation[catalog.id] && catalog.explanation && (
+                <div className="mt-3">
+                  <p className="text-sm font-medium text-gray-800 mb-1">Explanation:</p>
+                  <p className="text-sm text-gray-700 whitespace-pre-line">{catalog.explanation}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </main>
   )
 }
 
