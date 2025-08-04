@@ -9,6 +9,7 @@ export default function CatalogsPage() {
   const [loading, setLoading] = useState(true)
   const [summaries, setSummaries] = useState<Record<string, string>>({})
   const [explanations, setExplanations] = useState<Record<string, string>>({})
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const router = useRouter()
 
   // 🔐 Auth protection
@@ -22,14 +23,18 @@ export default function CatalogsPage() {
 
   useEffect(() => {
     const fetchCatalogs = async () => {
-      const { data, error } = await supabase.from('catalogs').select('*')
-      if (error) console.error('Error fetching catalogs:', error)
-      else setCatalogs(data || [])
-      setLoading(false)
-    }
-
-    fetchCatalogs()
-  }, [])
+      const { data, error } = await supabase.from('catalogs').select('*');
+      if (error) {
+        console.error('Error fetching catalogs:', error);
+        setErrorMsg('Failed to load catalogs. Please try again later.');
+        setCatalogs([]); // Optionally clear any stale data
+      } else {
+        setCatalogs(data || []);
+      }
+      setLoading(false);
+    };
+    fetchCatalogs();
+  }, []);
 
   const handleGenerate = async (
     type: 'summary' | 'explanation',
@@ -68,7 +73,21 @@ export default function CatalogsPage() {
     }))
   }
 
-  if (loading) return <p>Loading...</p>
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-32">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (errorMsg) {
+    return (
+      <div className="text-red-600 text-center mt-4">
+        Error loading catalogs: {errorMsg}
+      </div>
+    );
+  }
 
   return (
     <div>
