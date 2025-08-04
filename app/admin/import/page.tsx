@@ -1,11 +1,23 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { supabase } from '../../../lib/supabase'
 
 export default function AdminImportPage() {
   const [artistId, setArtistId] = useState('')
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
+  const router = useRouter()
+
+  // 🔐 Auth protection
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) router.push('/')
+    }
+    checkSession()
+  }, [router])
 
   const handleImport = async () => {
     if (!artistId) {
@@ -58,4 +70,3 @@ export default function AdminImportPage() {
     </div>
   )
 }
-

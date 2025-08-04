@@ -1,11 +1,22 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 
 export default function CatalogsPage() {
   const [catalogs, setCatalogs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const router = useRouter()
+
+  // 🔐 Auth protection
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) router.push('/')
+    }
+    checkSession()
+  }, [router])
 
   useEffect(() => {
     const fetchCatalogs = async () => {
