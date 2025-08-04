@@ -77,6 +77,7 @@ export default function CatalogsPage() {
         {catalogs.map((catalog) => (
           <div key={catalog.id} className="p-4 border rounded shadow">
             <h2 className="font-bold">{catalog.title} - {catalog.artist}</h2>
+            <p>Genre: {catalog.genre}</p>
             <p>Popularity: {catalog.popularity}</p>
             <p>Spotify Streams: {catalog.spotify_streams}</p>
             <p>YouTube Views: {catalog.youtube_views}</p>
