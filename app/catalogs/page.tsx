@@ -2,7 +2,8 @@ import CatalogCard from "./CatalogCard"
 
 export default async function CatalogsPage() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/catalogs`)
-  const catalogs = await res.json()
+  const data = await res.json()
+  const catalogs = Array.isArray(data) ? data : []
 
   return (
     <div className="max-w-4xl mx-auto mt-8">
