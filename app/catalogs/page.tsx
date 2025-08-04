@@ -12,7 +12,6 @@ export default function CatalogsPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const router = useRouter()
 
-  // 🔐 Auth protection
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
@@ -27,14 +26,14 @@ export default function CatalogsPage() {
       if (error) {
         console.error('Error fetching catalogs:', error);
         setErrorMsg('Failed to load catalogs. Please try again later.');
-        setCatalogs([]); // Optionally clear any stale data
+        setCatalogs([])
       } else {
-        setCatalogs(data || []);
+        setCatalogs(data || [])
       }
-      setLoading(false);
+      setLoading(false)
     };
-    fetchCatalogs();
-  }, []);
+    fetchCatalogs()
+  }, [])
 
   const handleGenerate = async (
     type: 'summary' | 'explanation',
@@ -76,7 +75,7 @@ export default function CatalogsPage() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-32">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -90,39 +89,46 @@ export default function CatalogsPage() {
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold">Your Catalogs</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+    <div className="min-h-screen bg-slate-50 px-6 py-10">
+      <h1 className="text-3xl font-bold text-slate-800 mb-6">🎵 Your Catalogs</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {catalogs.map((catalog) => (
-          <div key={catalog.id} className="p-4 border rounded shadow">
-            <h2 className="font-bold">{catalog.title} - {catalog.artist}</h2>
-            <p>Genre: {catalog.genre}</p>
-            <p>Popularity: {catalog.popularity}</p>
-            <p>Spotify Streams: {catalog.spotify_streams}</p>
-            <p>YouTube Views: {catalog.youtube_views}</p>
-            <p>Est. Earnings: ${catalog.estimated_earnings}</p>
-            <p>Valuation Score: {catalog.valuation_score}</p>
-            <div className="flex gap-2 mt-2">
+          <div
+            key={catalog.id}
+            className="bg-white p-6 rounded-xl border border-slate-200 shadow hover:shadow-md transition-shadow"
+          >
+            <h2 className="text-xl font-semibold text-slate-900 mb-1">
+              {catalog.title} — {catalog.artist}
+            </h2>
+            <p className="text-slate-600 text-sm mb-1">Genre: {catalog.genre}</p>
+            <p className="text-slate-600 text-sm">Popularity: {catalog.popularity}</p>
+            <p className="text-slate-600 text-sm">Spotify Streams: {catalog.spotify_streams}</p>
+            <p className="text-slate-600 text-sm">YouTube Views: {catalog.youtube_views}</p>
+            <p className="text-slate-600 text-sm">Est. Earnings: ${catalog.estimated_earnings}</p>
+            <p className="text-slate-600 text-sm mb-4">Valuation Score: {catalog.valuation_score}</p>
+
+            <div className="flex gap-2">
               <button
                 onClick={() => handleGenerate('summary', catalog)}
-                className="border px-2 py-1 rounded bg-blue-100"
+                className="bg-emerald-600 text-white px-3 py-1.5 rounded hover:bg-emerald-700 transition"
               >
                 Generate Summary
               </button>
               <button
                 onClick={() => handleGenerate('explanation', catalog)}
-                className="border px-2 py-1 rounded bg-green-100"
+                className="bg-slate-700 text-white px-3 py-1.5 rounded hover:bg-slate-800 transition"
               >
                 Generate Explanation
               </button>
             </div>
+
             {summaries[catalog.id] && (
-              <div className="mt-2 text-sm bg-blue-50 p-2 rounded">
+              <div className="mt-4 text-sm bg-emerald-50 text-emerald-900 p-3 rounded">
                 <strong>Summary:</strong> {summaries[catalog.id]}
               </div>
             )}
             {explanations[catalog.id] && (
-              <div className="mt-2 text-sm bg-green-50 p-2 rounded">
+              <div className="mt-2 text-sm bg-slate-100 text-slate-800 p-3 rounded">
                 <strong>Explanation:</strong> {explanations[catalog.id]}
               </div>
             )}
