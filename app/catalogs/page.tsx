@@ -47,11 +47,11 @@ export default function CatalogsPage() {
       title: catalog.title,
       artist: catalog.artist,
       genre: catalog.genre,
-      spotify_streams: catalog.spotify_streams,
-      youtube_views: catalog.youtube_views,
-      earnings_last_12mo: catalog.estimated_earnings,
+      spotify_streams: parseInt(catalog.spotify_streams),
+      youtube_views: parseInt(catalog.youtube_views),
+      earnings_last_12mo: parseFloat(catalog.estimated_earnings),
       ...(type === 'explanation' && {
-        valuation_score: catalog.valuation_score,
+        valuation_score: parseFloat(catalog.valuation_score),
       }),
     }
 
