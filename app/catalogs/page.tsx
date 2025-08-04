@@ -46,12 +46,12 @@ export default function CatalogsPage() {
       id: catalog.id,
       title: catalog.title,
       artist: catalog.artist,
-      genre: catalog.genre,
-      spotify_streams: parseInt(catalog.spotify_streams),
-      youtube_views: parseInt(catalog.youtube_views),
-      earnings_last_12mo: parseFloat(catalog.estimated_earnings),
+      genre: catalog.genre ?? '',
+      spotify_streams: parseInt(catalog.spotify_streams) || 0,
+      youtube_views: parseInt(catalog.youtube_views) || 0,
+      earnings_last_12mo: parseFloat(catalog.estimated_earnings) || 0,
       ...(type === 'explanation' && {
-        valuation_score: parseFloat(catalog.valuation_score),
+        valuation_score: parseFloat(catalog.valuation_score) || 0,
       }),
     }
 
