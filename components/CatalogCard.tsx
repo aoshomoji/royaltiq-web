@@ -29,11 +29,14 @@ export default function CatalogCard({ catalog, summary, explanation, onGenerate 
       </div>
 
       <div className="grid grid-cols-2 gap-x-4 text-sm text-slate-700">
-        <p>🎯 Popularity: <span className="font-semibold">{catalog.popularity}</span></p>
+        <p>🎯 Popularity: <span className="font-semibold">{catalog.popularity ?? 'N/A'}</span></p>
+        <p>📊 Valuation Score: <span className="font-semibold">{catalog.valuation_score ?? 'N/A'}</span></p>
         <p>💵 Est. Earnings: <span className="font-semibold">${catalog.estimated_earnings.toLocaleString()}</span></p>
-        <p>🎧 Spotify Streams: <span className="font-semibold">{catalog.spotify_streams.toLocaleString()}</span></p>
-        <p>📺 YouTube Views: <span className="font-semibold">{catalog.youtube_views.toLocaleString()}</span></p>
-        <p>📊 Valuation Score: <span className="font-semibold">{catalog.valuation_score}</span></p>
+        <p>🎧 Spotify Streams: <span className="font-semibold">{catalog.spotify_streams?.toLocaleString?.() ?? 'N/A'}</span></p>
+        <p>📺 YouTube Views: <span className="font-semibold">{catalog.youtube_views?.toLocaleString?.() ?? 'N/A'}</span></p>
+        <p>💵 Est. Earnings: <span className="font-semibold">
+          {catalog.estimated_earnings != null ? `$${catalog.estimated_earnings.toLocaleString?.()}` : 'N/A'}
+        </span></p>
       </div>
 
       <div className="flex gap-2 mt-4">
