@@ -3,8 +3,7 @@ module.exports = {
   content: [
     './app/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
-    './pages/**/*.{js,ts,jsx,tsx}', // in case pages are used
-    './src/**/*.{js,ts,jsx,tsx}',   // in case you move logic into src/
+    './pages/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     extend: {
