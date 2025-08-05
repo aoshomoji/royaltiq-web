@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
+import CatalogCard from '../../components/CatalogCard'
+
 
 export default function CatalogsPage() {
   const [catalogs, setCatalogs] = useState<any[]>([])
@@ -93,46 +95,13 @@ export default function CatalogsPage() {
       <h1 className="text-3xl font-bold text-slate-800 mb-6">🎵 Your Catalogs</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {catalogs.map((catalog) => (
-          <div
+          <CatalogCard
             key={catalog.id}
-            className="bg-white p-6 rounded-xl border border-slate-200 shadow hover:shadow-md transition-shadow"
-          >
-            <h2 className="text-xl font-semibold text-slate-900 mb-1">
-              {catalog.title} — {catalog.artist}
-            </h2>
-            <p className="text-slate-600 text-sm mb-1">Genre: {catalog.genre}</p>
-            <p className="text-slate-600 text-sm">Popularity: {catalog.popularity}</p>
-            <p className="text-slate-600 text-sm">Spotify Streams: {catalog.spotify_streams}</p>
-            <p className="text-slate-600 text-sm">YouTube Views: {catalog.youtube_views}</p>
-            <p className="text-slate-600 text-sm">Est. Earnings: ${catalog.estimated_earnings}</p>
-            <p className="text-slate-600 text-sm mb-4">Valuation Score: {catalog.valuation_score}</p>
-
-            <div className="flex gap-2">
-              <button
-                onClick={() => handleGenerate('summary', catalog)}
-                className="bg-emerald-600 text-white px-3 py-1.5 rounded hover:bg-emerald-700 transition"
-              >
-                Generate Summary
-              </button>
-              <button
-                onClick={() => handleGenerate('explanation', catalog)}
-                className="bg-slate-700 text-white px-3 py-1.5 rounded hover:bg-slate-800 transition"
-              >
-                Generate Explanation
-              </button>
-            </div>
-
-            {summaries[catalog.id] && (
-              <div className="mt-4 text-sm bg-emerald-50 text-emerald-900 p-3 rounded">
-                <strong>Summary:</strong> {summaries[catalog.id]}
-              </div>
-            )}
-            {explanations[catalog.id] && (
-              <div className="mt-2 text-sm bg-slate-100 text-slate-800 p-3 rounded">
-                <strong>Explanation:</strong> {explanations[catalog.id]}
-              </div>
-            )}
-          </div>
+            catalog={catalog}
+            summary={summaries[catalog.id]}
+            explanation={explanations[catalog.id]}
+            onGenerate={handleGenerate}
+          />
         ))}
       </div>
     </div>
