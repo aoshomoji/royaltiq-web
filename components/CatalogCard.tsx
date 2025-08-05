@@ -1,5 +1,7 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+
 type Catalog = {
   id: string
   title: string
@@ -20,61 +22,99 @@ type Props = {
 }
 
 export default function CatalogCard({ catalog, summary, explanation, onGenerate }: Props) {
+  const [showSummary, setShowSummary] = useState(false)
+  const [showExplanation, setShowExplanation] = useState(false)
+
+  useEffect(() => {
+    if (summary) setShowSummary(true)
+    if (explanation) setShowExplanation(true)
+  }, [summary, explanation])
+
   return (
     <div className="bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow p-6 space-y-4">
+      {/* Header */}
       <div>
         <h2 className="text-xl font-bold text-slate-800">{catalog.title}</h2>
-        <p className="text-slate-500 text-sm mb-1">by {catalog.artist}</p>
-        {catalog.genre && <p className="text-slate-400 text-xs">Genre: {catalog.genre}</p>}
+        <p className="text-slate-500 text-sm">by {catalog.artist}</p>
+        {catalog.genre && <p className="text-slate-400 text-xs mt-1">Genre: {catalog.genre}</p>}
       </div>
 
-      <div className="grid grid-cols-2 gap-x-4 text-sm text-slate-700">
-        <p>📊 Valuation Score: <span className="font-semibold">
-          {catalog.valuation_score != null ? catalog.valuation_score : 'N/A'}
-        </span></p>
-        
-        <p>🎯 Popularity: <span className="font-semibold">
-          {catalog.popularity != null ? catalog.popularity : 'N/A'}
-        </span></p>
-        
-        <p>🎧 Spotify Streams: <span className="font-semibold">
-          {catalog.spotify_streams != null ? catalog.spotify_streams.toLocaleString?.() : 'N/A'}
-        </span></p>
-        
-        <p>📺 YouTube Views: <span className="font-semibold">
-          {catalog.youtube_views != null ? catalog.youtube_views.toLocaleString?.() : 'N/A'}
-        </span></p>
-        
-        <p>💵 Est. Earnings: <span className="font-semibold">
-          {catalog.estimated_earnings != null ? `$${catalog.estimated_earnings.toLocaleString?.()}` : 'N/A'}
-        </span></p>
+      {/* Stats */}
+      <div className="grid grid-cols-2 gap-y-2 gap-x-6 text-sm text-slate-700">
+        <p>
+          💵 <span className="font-medium">Est. Earnings:</span>{' '}
+          <span className="font-semibold">
+            {catalog.estimated_earnings != null ? `$${catalog.estimated_earnings.toLocaleString?.()}` : 'N/A'}
+          </span>
+        </p>
+        <p>
+          📊 <span className="font-medium">Valuation Score:</span>{' '}
+          <span className="font-semibold">
+            {catalog.valuation_score != null ? catalog.valuation_score : 'N/A'}
+          </span>
+        </p>
+        <p>
+          🎧 <span className="font-medium">Spotify Streams:</span>{' '}
+          <span className="font-semibold">
+            {catalog.spotify_streams != null ? catalog.spotify_streams.toLocaleString?.() : 'N/A'}
+          </span>
+        </p>
+        <p>
+          📺 <span className="font-medium">YouTube Views:</span>{' '}
+          <span className="font-semibold">
+            {catalog.youtube_views != null ? catalog.youtube_views.toLocaleString?.() : 'N/A'}
+          </span>
+        </p>
+        <p>
+          🎯 <span className="font-medium">Popularity:</span>{' '}
+          <span className="font-semibold">
+            {catalog.popularity != null ? catalog.popularity : 'N/A'}
+          </span>
+        </p>
       </div>
 
-      <div className="flex gap-2 mt-4">
+      {/* Buttons */}
+      <div className="flex flex-wrap gap-3 mt-4">
         <button
           onClick={() => onGenerate('summary', catalog)}
-          className="bg-emerald-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-emerald-700 transition"
+          className="bg-emerald-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
         >
           Generate Summary
         </button>
         <button
           onClick={() => onGenerate('explanation', catalog)}
-          className="bg-slate-700 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-slate-800 transition"
+          className="bg-slate-700 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
         >
           Generate Explanation
         </button>
       </div>
 
-      {summary && (
-        <div className="bg-emerald-50 text-emerald-900 p-3 rounded-lg text-sm">
-          <strong>Summary:</strong> {summary}
+      {/* AI Results with transitions */}
+      <div className="space-y-2">
+        <div
+          className={`transition-all duration-300 ease-in-out overflow-hidden ${
+            showSummary ? 'opacity-100 max-h-96' : 'opacity-0 max-h-0'
+          }`}
+        >
+          {summary && (
+            <div className="bg-emerald-50 text-emerald-900 p-3 rounded-lg text-sm border border-emerald-200">
+              <strong>Summary:</strong> {summary}
+            </div>
+          )}
         </div>
-      )}
-      {explanation && (
-        <div className="bg-slate-100 text-slate-800 p-3 rounded-lg text-sm mt-2">
-          <strong>Explanation:</strong> {explanation}
+
+        <div
+          className={`transition-all duration-300 ease-in-out overflow-hidden ${
+            showExplanation ? 'opacity-100 max-h-96' : 'opacity-0 max-h-0'
+          }`}
+        >
+          {explanation && (
+            <div className="bg-slate-50 text-slate-800 p-3 rounded-lg text-sm border border-slate-200">
+              <strong>Explanation:</strong> {explanation}
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   )
 }
