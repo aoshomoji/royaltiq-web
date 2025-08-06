@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 type Catalog = {
   id: string
@@ -89,7 +89,7 @@ export default function CatalogCard({ catalog, summary, explanation, onGenerate 
         </button>
       </div>
 
-      {/* AI Results with transitions */}
+      {/* AI Results with fade/expand transitions */}
       <div className="space-y-2">
         <div
           className={`transition-all duration-300 ease-in-out overflow-hidden ${
