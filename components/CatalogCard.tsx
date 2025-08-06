@@ -132,7 +132,7 @@ export default function CatalogCard({ catalog, summary, explanation, onGenerate 
           }`}
         >
           {normalizedSummary && summary !== 'Loading...' && (
-            <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900 overflow-auto max-h-64">
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900 overflow-auto max-h-80 md:max-h-96 2xl:max-h-[32rem]">
               <ReactMarkdown
                 components={{
                   h1: (props) => <h3 className="text-sm font-semibold mt-2 mb-1" {...props} />,
@@ -156,7 +156,7 @@ export default function CatalogCard({ catalog, summary, explanation, onGenerate 
           }`}
         >
           {normalizedExplanation && explanation !== 'Loading...' && (
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-800 overflow-auto max-h-64">
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-800 overflow-auto max-h-80 md:max-h-96 2xl:max-h-[32rem]">
               <ReactMarkdown
                 components={{
                   h1: (props) => <h3 className="text-sm font-semibold mt-2 mb-1" {...props} />,
