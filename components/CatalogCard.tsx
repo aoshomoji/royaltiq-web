@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import ExpandableMarkdown from './ExpandableMarkdown'
 
 const fmtUSD = (n: number) =>
   Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n)
@@ -132,12 +131,22 @@ export default function CatalogCard({ catalog, summary, explanation, onGenerate 
             showSummary ? 'opacity-100 max-h-[32rem]' : 'opacity-0 max-h-0'
           }`}
         >
-          {/* SUMMARY wrapper with Show more */}
           {normalizedSummary && summary !== 'Loading...' && (
-            <ExpandableMarkdown
-              text={normalizedSummary}
-              accent="emerald"
-          />
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900 overflow-auto max-h-64">
+              <ReactMarkdown
+                components={{
+                  h1: (props) => <h3 className="text-sm font-semibold mt-2 mb-1" {...props} />,
+                  h2: (props) => <h4 className="text-sm font-semibold mt-2 mb-1" {...props} />,
+                  p:  (props) => <p className="mb-2 leading-relaxed" {...props} />,
+                  ul: (props) => <ul className="list-disc pl-5 space-y-1" {...props} />,
+                  ol: (props) => <ol className="list-decimal pl-5 space-y-1" {...props} />,
+                  li: (props) => <li className="marker:text-slate-400" {...props} />,
+                  hr: () => <hr className="my-3 border-slate-200" />,
+                }}
+              >
+                {normalizedSummary}
+              </ReactMarkdown>
+            </div>
           )}
         </div>
 
@@ -147,7 +156,21 @@ export default function CatalogCard({ catalog, summary, explanation, onGenerate 
           }`}
         >
           {normalizedExplanation && explanation !== 'Loading...' && (
-            <ExpandableMarkdown text={normalizedExplanation} accent="slate" />
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-800 overflow-auto max-h-64">
+              <ReactMarkdown
+                components={{
+                  h1: (props) => <h3 className="text-sm font-semibold mt-2 mb-1" {...props} />,
+                  h2: (props) => <h4 className="text-sm font-semibold mt-2 mb-1" {...props} />,
+                  p:  (props) => <p className="mb-2 leading-relaxed" {...props} />,
+                  ul: (props) => <ul className="list-disc pl-5 space-y-1" {...props} />,
+                  ol: (props) => <ol className="list-decimal pl-5 space-y-1" {...props} />,
+                  li: (props) => <li className="marker:text-slate-400" {...props} />,
+                  hr: () => <hr className="my-3 border-slate-200" />,
+                }}
+              >
+                {normalizedExplanation}
+              </ReactMarkdown>
+            </div>
           )}
         </div>
       </div>
