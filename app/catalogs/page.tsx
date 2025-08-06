@@ -90,6 +90,24 @@ export default function CatalogsPage() {
     );
   }
 
+  if (!loading && catalogs.length === 0) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4">
+        <h1 className="text-2xl font-bold text-slate-800 mb-2">No catalogs yet</h1>
+        <p className="text-slate-600 mb-6 text-center max-w-sm">
+          Import an artist’s top tracks to start valuing music royalties.
+        </p>
+  
+        <a
+          href="/admin/import"
+          className="inline-block rounded-lg bg-emerald-600 px-6 py-3 text-white font-medium hover:bg-emerald-700 transition"
+        >
+          Import from Spotify
+        </a>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 px-6 py-10">
       <div className="h-2 bg-emerald-600 mb-4 rounded"></div>
