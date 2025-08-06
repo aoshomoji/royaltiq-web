@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 
 type Catalog = {
@@ -22,14 +22,26 @@ type Props = {
   onGenerate: (type: 'summary' | 'explanation', catalog: Catalog) => void
 }
 
+/** Convert leading bullet characters `•` to Markdown `- ` so lists render nicely. */
+function normalizeMarkdown(md?: string) {
+  if (!md) return ''
+  // Convert lines beginning with optional spaces + bullet char into dash list items
+  return md
+    .replace(/^\s*•\s+/gm, '- ')
+    // If the model emits `•` on its own line before the sentence,
+    // join it to the next line as a list item.
+    .replace(/\n•\s*$/gm, '\n- ')
+}
+
 export default function CatalogCard({ catalog, summary, explanation, onGenerate }: Props) {
-  // Smooth fade/expand when content arrives
   const [showSummary, setShowSummary] = useState(false)
   const [showExplanation, setShowExplanation] = useState(false)
 
-  // Derive loading states from the strings you already set in page.tsx
   const isLoadingSummary = summary === 'Loading...'
   const isLoadingExplanation = explanation === 'Loading...'
+
+  const normalizedSummary = useMemo(() => normalizeMarkdown(summary), [summary])
+  const normalizedExplanation = useMemo(() => normalizeMarkdown(explanation), [explanation])
 
   useEffect(() => {
     if (summary && summary !== 'Loading...') setShowSummary(true)
@@ -42,7 +54,6 @@ export default function CatalogCard({ catalog, summary, explanation, onGenerate 
       <div className="space-y-1">
         <h2 className="text-xl font-bold text-slate-800">{catalog.title}</h2>
         <p className="text-slate-500 text-sm">by {catalog.artist}</p>
-
         {catalog.genre && (
           <span className="inline-flex w-fit items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
             {catalog.genre}
@@ -116,17 +127,22 @@ export default function CatalogCard({ catalog, summary, explanation, onGenerate 
             showSummary ? 'opacity-100 max-h-[32rem]' : 'opacity-0 max-h-0'
           }`}
         >
-          {summary && summary !== 'Loading...' && (
+          {normalizedSummary && summary !== 'Loading...' && (
             <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900">
               <ReactMarkdown
                 components={{
-                  h1: ({node, ...props}) => <h1 className="text-lg font-bold mt-2" {...props} />,
-                  h2: ({node, ...props}) => <h2 className="text-base font-semibold mt-2" {...props} />,
-                  p:  ({node, ...props}) => <p className="mb-2" {...props} />,
-                  li: ({node, ...props}) => <li className="list-disc list-inside" {...props} />,
+                  h1: (props) => <h3 className="text-sm font-semibold mt-2 mb-1" {...props} />,
+                  h2: (props) => <h4 className="text-sm font-semibold mt-2 mb-1" {...props} />,
+                  h3: (props) => <h5 className="text-sm font-semibold mt-2 mb-1" {...props} />,
+                  p: (props) => <p className="mb-2 leading-relaxed" {...props} />,
+                  strong: (props) => <strong className="font-semibold" {...props} />,
+                  ul: (props) => <ul className="list-disc pl-5 space-y-1" {...props} />,
+                  ol: (props) => <ol className="list-decimal pl-5 space-y-1" {...props} />,
+                  li: (props) => <li className="marker:text-slate-400" {...props} />,
+                  hr: () => <hr className="my-3 border-slate-200" />,
                 }}
               >
-                {summary}
+                {normalizedSummary}
               </ReactMarkdown>
             </div>
           )}
@@ -137,20 +153,25 @@ export default function CatalogCard({ catalog, summary, explanation, onGenerate 
             showExplanation ? 'opacity-100 max-h-[32rem]' : 'opacity-0 max-h-0'
           }`}
         >
-          {explanation && explanation !== 'Loading...' && (
+          {normalizedExplanation && explanation !== 'Loading...' && (
             <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-800">
               <ReactMarkdown
                 components={{
-                  h1: ({node, ...props}) => <h1 className="text-lg font-bold mt-2" {...props} />,
-                  h2: ({node, ...props}) => <h2 className="text-base font-semibold mt-2" {...props} />,
-                  p:  ({node, ...props}) => <p className="mb-2" {...props} />,
-                  li: ({node, ...props}) => <li className="list-disc list-inside" {...props} />,
+                  h1: (props) => <h3 className="text-sm font-semibold mt-2 mb-1" {...props} />,
+                  h2: (props) => <h4 className="text-sm font-semibold mt-2 mb-1" {...props} />,
+                  h3: (props) => <h5 className="text-sm font-semibold mt-2 mb-1" {...props} />,
+                  p: (props) => <p className="mb-2 leading-relaxed" {...props} />,
+                  strong: (props) => <strong className="font-semibold" {...props} />,
+                  ul: (props) => <ul className="list-disc pl-5 space-y-1" {...props} />,
+                  ol: (props) => <ol className="list-decimal pl-5 space-y-1" {...props} />,
+                  li: (props) => <li className="marker:text-slate-400" {...props} />,
+                  hr: () => <hr className="my-3 border-slate-200" />,
                 }}
               >
-                {explanation}
+                {normalizedExplanation}
               </ReactMarkdown>
             </div>
-          )}        
+          )}
         </div>
       </div>
     </div>
