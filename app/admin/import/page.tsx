@@ -31,7 +31,10 @@ export default function AdminImportPage() {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/import`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
+        },
         body: JSON.stringify({ artist_id: artistId }),
       })
 
