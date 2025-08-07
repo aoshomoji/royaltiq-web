@@ -2,9 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-
-const fmtUSD = (n: number) =>
-  Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n)
+import { fmtUSD } from '../lib/format'
 
 type Catalog = {
   id: string
