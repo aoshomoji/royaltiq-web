@@ -66,16 +66,28 @@ export default function CatalogCard({ catalog, summary, explanation, onGenerate 
 
       {/* Metrics */}
       <div className="grid grid-cols-2 gap-y-2 gap-x-6 text-sm text-slate-700">
-        <p>
+        <p className="flex items-center gap-1">
           💵 <span className="font-medium">Est. Earnings:</span>{' '}
           <span className="font-semibold">
             {catalog.estimated_earnings != null ? fmtUSD(catalog.estimated_earnings) : 'N/A'}
           </span>
+          <span
+            className="text-xs bg-slate-200 rounded px-[4px] cursor-help"
+            title="Streams & earnings are modelled from Spotify popularity – not exact counts."
+          >
+            ℹ️
+          </span>
         </p>
-        <p>
+        <p className="flex items-center gap-1">
           📊 <span className="font-medium">Valuation Score:</span>{' '}
           <span className="font-semibold">
             {catalog.valuation_score != null ? catalog.valuation_score : 'N/A'}
+          </span>
+          <span
+            className="text-xs bg-slate-200 rounded px-[4px] cursor-help"
+            title="Based on modelled streams & earnings."
+          >
+            ℹ️
           </span>
         </p>
         <p>
