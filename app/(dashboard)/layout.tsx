@@ -1,4 +1,3 @@
-/* app/(dashboard)/layout.tsx */
 import '../globals.css'
 import { Inter } from 'next/font/google'
 import { supabase } from '../../lib/supabase'
