@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '../../lib/supabase'
-import CatalogCard from '../../components/CatalogCard'
+import { supabase } from '../../../lib/supabase'
+import CatalogCard from '../../../components/CatalogCard'
 
 
 export default function CatalogsPage() {
