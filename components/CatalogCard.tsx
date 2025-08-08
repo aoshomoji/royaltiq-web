@@ -5,7 +5,8 @@ import ReactMarkdown from 'react-markdown'
 import { fmtUSD } from '../lib/format'
 
 type Catalog = {
-  id: string
+  catalog_id: string
+  track_id: string
   title: string
   artist: string
   genre?: string
