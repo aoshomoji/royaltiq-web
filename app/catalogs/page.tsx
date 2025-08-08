@@ -42,14 +42,14 @@ export default function CatalogsPage() {
     catalog: any
   ) => {
     const setFn = type === 'summary' ? setSummaries : setExplanations
-    const key = catalog.id
+    const key = catalog.catalog_id
 
     setFn((prev) => ({ ...prev, [key]: 'Loading...' }))
 
     const endpoint = `${process.env.NEXT_PUBLIC_API_URL}/${type}`
 
     const payload = {
-      id: catalog.id,
+      id: catalog.track_id,
       title: catalog.title,
       artist: catalog.artist,
       genre: catalog.genre ?? '',
@@ -115,10 +115,10 @@ export default function CatalogsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {catalogs.map((catalog) => (
           <CatalogCard
-            key={catalog.id}
+            key={catalog.catalog_id}
             catalog={catalog}
-            summary={summaries[catalog.id]}
-            explanation={explanations[catalog.id]}
+            summary={summaries[catalog.catalog_id]}
+            explanation={explanations[catalog.catalog_id]}
             onGenerate={handleGenerate}
           />
         ))}
